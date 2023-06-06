@@ -20,6 +20,13 @@ export type ChatPrompt = {
 
 export const screenshotExampleUrl = "https://example.com"
 
+export type PathVariables = {
+    fullPage?: boolean,
+    viewportWidth?: number,
+    viewportHeight?: number,
+    deviceScaleFactor?: number
+}
+
 export type SummarizationResult = {
     text: string
 }
@@ -31,10 +38,8 @@ export type GrammarFixResult = {
 
 export type Screenshot = {
     url: string
-    viewportWidth: number
-    viewportHeight: number
-    device: string
-}
+    device: string;
+} & PathVariables;
 
 export type UrlDataFont = {
     first: string
@@ -44,10 +49,7 @@ export type UrlDataFont = {
 
 export type ScreenshotDevice = {
     name: string
-    viewportWidth: number
-    viewportHeight: number
-    deviceScaleFactor: number
-}
+} & PathVariables;
 
 export const screenshotDevices: ScreenshotDevice[] = [
     {
@@ -62,7 +64,6 @@ export const screenshotDevices: ScreenshotDevice[] = [
         viewportHeight: 428,
         deviceScaleFactor: 3,
     },
-
     {
         name: "Pixel 5 Landscape",
         viewportWidth: 851,
@@ -86,5 +87,10 @@ export const screenshotDevices: ScreenshotDevice[] = [
         viewportWidth: 375,
         viewportHeight: 812,
         deviceScaleFactor: 3,
+    },
+    {
+        name: "Full page",
+        fullPage: true,
+        deviceScaleFactor: 1,
     },
 ]

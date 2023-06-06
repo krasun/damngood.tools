@@ -32,19 +32,27 @@ const ScreenshotPlaceholder = () => {
 }
 
 type ScreenshotProps = {
-    viewportWidth: number
-    viewportHeight: number
+    fullPage?: boolean
+    viewportWidth?: number
+    viewportHeight?: number
     device: string
     url: string
 }
 
 const Screenshot = ({
+    fullPage,
     viewportWidth,
     viewportHeight,
     device,
     url,
 }: ScreenshotProps) => {
     const [loaded, setLoaded] = useState(false)
+    let screenshotInfo: string;
+    if (fullPage) {
+        screenshotInfo = device; 
+    } else {
+        screenshotInfo = `${device} (${viewportWidth}x${viewportHeight})`;
+    }
 
     return (
         <div>
@@ -55,7 +63,7 @@ const Screenshot = ({
                     className="flex flex-row items-center justify-center text-muted-foreground"
                 >
                     <span>
-                        {device} ({viewportWidth}x{viewportHeight})
+                        {screenshotInfo}
                     </span>
                     <ExternalLink className="ml-2 h-4 w-4" />
                 </Link>
@@ -183,6 +191,7 @@ export function Screenshots({
                     <Screenshot
                         key={s.url}
                         url={s.url}
+                        fullPage={s.fullPage}
                         viewportWidth={s.viewportWidth}
                         viewportHeight={s.viewportHeight}
                         device={s.device}
