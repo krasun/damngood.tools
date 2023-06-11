@@ -29,6 +29,13 @@ export default function IndexPage() {
             link: "/tools/screenshots-for-dimensions",
         },
         {
+            name: "Full page screenshot",
+            description:
+                "Get full page screenshot",
+            icon: <Aperture />,
+            link: "/tools/full-page-screenshot",
+        },
+        {
             name: "Fonts",
             description:
                 "Quickly detect fonts used on any website and get links on how to install or download them.",

@@ -1,6 +1,6 @@
 import { PageHeader } from "@/components/page-header"
 import { Screenshots } from "./Screenshots"
-import { generateExampleScreenshots, generateScreenshots } from "@/lib/screenshots"
+import { generateExampleScreenshots } from "@/lib/screenshots"
 import { screenshotExampleUrl } from "@/lib/shared";
 
 export default async function ScreenshotsForDimensions() {

@@ -32,6 +32,7 @@ const ScreenshotPlaceholder = () => {
 }
 
 type ScreenshotProps = {
+    fullPage?: boolean
     viewportWidth?: number
     viewportHeight?: number
     device: string
@@ -39,8 +40,6 @@ type ScreenshotProps = {
 }
 
 const Screenshot = ({
-    viewportWidth,
-    viewportHeight,
     device,
     url,
 }: ScreenshotProps) => {
@@ -55,7 +54,7 @@ const Screenshot = ({
                     className="flex flex-row items-center justify-center text-muted-foreground"
                 >
                     <span>
-                        {device} ({viewportWidth}x{viewportHeight})
+                        {device}
                     </span>
                     <ExternalLink className="ml-2 h-4 w-4" />
                 </Link>
@@ -90,15 +89,12 @@ const Screenshot = ({
     )
 }
 
-interface ScreenshotsProps {
-    exampleScreenshots: ScreenshotData[]
+interface ExampleScreenshotProps {
+    exampleScreenshot: ScreenshotData
     exampleScreenshotUrl: string
 }
 
-export function Screenshots({
-    exampleScreenshots,
-    exampleScreenshotUrl,
-}: ScreenshotsProps) {
+export function Screenshots(screenshotProps: ExampleScreenshotProps) {
     const { toast } = useToast()
     const {
         register,
@@ -109,15 +105,15 @@ export function Screenshots({
     })
 
     const [generating, setGenerating] = useState<boolean>(false)
-    const [screenshots, setScreenshots] =
-        useState<ScreenshotData[]>(exampleScreenshots)
+    const [screenshot, setScreenshot] =
+        useState<ScreenshotData>(screenshotProps.exampleScreenshot)
 
     const onSubmit = async (data: GenerateScreenshotsRequest) => {
         setGenerating(true)
 
         try {
             const response = await fetch(
-                "/tools/screenshots-for-dimensions/api",
+                "/tools/full-page-screenshot/api",
                 {
                     method: "POST",
                     body: JSON.stringify(data),
@@ -127,11 +123,11 @@ export function Screenshots({
 
             if (response.ok) {
                 const result = (await response.json()) as {
-                    screenshots: ScreenshotData[]
+                    screenshot: ScreenshotData
                 }
 
-                if (result.screenshots && result.screenshots.length > 0) {
-                    return setScreenshots(result.screenshots)
+                if (result.screenshot) {
+                    return setScreenshot(result.screenshot)
                 }
             }
 
@@ -154,13 +150,19 @@ export function Screenshots({
                 className="flex max-w-[250px] flex-col gap-5 md:col-span-1"
             >
                 <div className="grid w-full items-center gap-1.5">
-                    <Label htmlFor="website">Your website</Label>
+                    <Label htmlFor="website">Your website:</Label>
                     <Input
                         type="url"
                         id="website"
-                        placeholder={exampleScreenshotUrl}
+                        placeholder={screenshotProps.exampleScreenshotUrl}
                         {...register("website")}
                     />
+                    {/* <Label htmlFor="scale-factor">Choose the scale factor:</Label>
+                    <select id="scale-factor">
+                        <option value="1" defaultChecked>1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                    </select> */}
                     {errors.website && errors.website?.message && (
                         <p className="text-sm text-destructive">
                             {errors.website?.message}
@@ -174,20 +176,17 @@ export function Screenshots({
                             Please wait
                         </>
                     ) : (
-                        "Render screenshots"
+                        "Render screenshot"
                     )}
                 </Button>
             </form>
             <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
-                {screenshots.map((s) => (
-                    <Screenshot
-                        key={s.url}
-                        url={s.url}
-                        viewportWidth={s.viewportWidth}
-                        viewportHeight={s.viewportHeight}
-                        device={s.device}
-                    />
-                ))}
+                <Screenshot
+                    key={screenshot.url}
+                    url={screenshot.url}
+                    fullPage={screenshot.fullPage}
+                    device={screenshot.device}
+                />
             </div>
         </div>
     )
