@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { GenerateScreenshotsRequest, GenerateScreenshotsRequestSchema } from '@/lib/schema';
-import { generateScreenshots } from '@/lib/screenshots';
+import { generateScreenshot } from '@/lib/screenshots';
 
 export async function POST(request: NextRequest) {
     try {
         const generateRequest = await request.json() as GenerateScreenshotsRequest;
         const result = await GenerateScreenshotsRequestSchema.safeParseAsync(generateRequest);
         if (result.success) {
-            const screenshot = await generateScreenshots(                
+            const screenshot = await generateScreenshot(                
                 generateRequest.website
             );
 

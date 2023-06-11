@@ -68,12 +68,10 @@ export async function generateScreenshot(url: string): Promise<Screenshot> {
     return mapScreenshot(url, screenshotFullPage); 
 }
 
-function mapScreenshot(url: string, screenshotDevice: ScreenshotDevice): Screenshot {
+function mapScreenshot(url: string, screenshotDevice: ScreenshotDevice): Screenshot { 
+    console.log(screenshotUrl(url, screenshotDevice))
     return {
-        url: screenshotUrl(
-            url ,
-            screenshotDevice
-        ),
+        url: screenshotUrl(url, screenshotDevice),
         viewportWidth: screenshotDevice.viewportWidth,
         viewportHeight: screenshotDevice.viewportHeight,
         device: screenshotDevice.name,
