@@ -20,7 +20,7 @@ export type ChatPrompt = {
 
 export const screenshotExampleUrl = "https://example.com"
 
-export type PathVariables = {
+export type ScreenshotOptions = {
     fullPage?: boolean,
     viewportWidth?: number,
     viewportHeight?: number,
@@ -39,7 +39,7 @@ export type GrammarFixResult = {
 export type Screenshot = {
     url: string
     device: string;
-} & PathVariables;
+} & ScreenshotOptions;
 
 export type UrlDataFont = {
     first: string
@@ -49,10 +49,10 @@ export type UrlDataFont = {
 
 export type ScreenshotDevice = {
     name: string
-} & PathVariables;
+} & ScreenshotOptions;
 
 export const screenshotFullPage: ScreenshotDevice = {
-    name: "Full page",
+    name: "Full Page",
     fullPage: true,
     deviceScaleFactor: 1,
 }
@@ -70,7 +70,6 @@ export const screenshotDevices: ScreenshotDevice[] = [
         viewportHeight: 428,
         deviceScaleFactor: 3,
     },
-
     {
         name: "Pixel 5 Landscape",
         viewportWidth: 851,

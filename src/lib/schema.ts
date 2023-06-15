@@ -12,6 +12,14 @@ export type GenerateScreenshotsRequest = z.infer<
     typeof GenerateScreenshotsRequestSchema
 >
 
+export const FullPageScreenshotSchema = z.object({
+    website: z.string().url(),
+    deviceName: z.optional(z.string()).or(z.literal(""))
+})
+export type GenerateFullPageScreenshotRequest = z.infer<
+    typeof FullPageScreenshotSchema
+>
+
 export const SummarizeURLRequestSchema = z.object({
     website: z.string().url(),
 })

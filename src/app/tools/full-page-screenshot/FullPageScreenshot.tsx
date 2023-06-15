@@ -1,21 +1,23 @@
 "use client"
 
-import { useState } from "react"
+import { forwardRef, Ref, useState } from "react"
 import Link from "next/link"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ExternalLink, Loader2 } from "lucide-react"
-import { useForm } from "react-hook-form"
+import { Controller, useForm } from "react-hook-form"
 
 import {
-    GenerateScreenshotsRequest,
-    GenerateScreenshotsRequestSchema,
+    FullPageScreenshotSchema,
+    GenerateFullPageScreenshotRequest,
 } from "@/lib/schema"
-import { Screenshot as ScreenshotData } from "@/lib/shared"
+import { Screenshot as ScreenshotData, screenshotDevices } from "@/lib/shared"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/components/ui/use-toast"
+import { SelectProps } from "@radix-ui/react-select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 const ScreenshotPlaceholder = () => {
     return (
@@ -31,6 +33,27 @@ const ScreenshotPlaceholder = () => {
     )
 }
 
+const DeviceSelect = forwardRef(
+    (
+        { ...props }: SelectProps & { forwardedRef: Ref<HTMLButtonElement> },
+        forwardedRef: Ref<HTMLButtonElement>
+    ) => {
+        return (
+            <Select {...props}>
+                <SelectTrigger className="w-full" ref={forwardedRef}>
+                    <SelectValue placeholder="Full Page"/>
+                </SelectTrigger>
+                <SelectContent>
+                    {
+                        screenshotDevices.map(device => (<SelectItem key={device.name} value={device.name}>{device.name}</SelectItem>))
+                    }
+                </SelectContent>
+            </Select>
+        )
+    }
+)
+DeviceSelect.displayName = "DeviceSelect"
+
 type ScreenshotProps = {
     fullPage?: boolean
     viewportWidth?: number
@@ -40,6 +63,8 @@ type ScreenshotProps = {
 }
 
 const Screenshot = ({
+    viewportWidth,
+    viewportHeight,
     device,
     url,
 }: ScreenshotProps) => {
@@ -54,7 +79,7 @@ const Screenshot = ({
                     className="flex flex-row items-center justify-center text-muted-foreground"
                 >
                     <span>
-                        {device}
+                        {device} {viewportWidth && viewportWidth > 0 && viewportHeight && viewportHeight > 0 ? (viewportWidth + "x" + viewportHeight) : ''}
                     </span>
                     <ExternalLink className="ml-2 h-4 w-4" />
                 </Link>
@@ -94,21 +119,22 @@ interface ExampleScreenshotProps {
     exampleScreenshotUrl: string
 }
 
-export function Screenshots(screenshotProps: ExampleScreenshotProps) {
+export function FullPageScreenshot(screenshotProps: ExampleScreenshotProps) {
     const { toast } = useToast()
     const {
+        control,
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm<GenerateScreenshotsRequest>({
-        resolver: zodResolver(GenerateScreenshotsRequestSchema),
+    } = useForm<GenerateFullPageScreenshotRequest>({
+        resolver: zodResolver(FullPageScreenshotSchema),
     })
 
     const [generating, setGenerating] = useState<boolean>(false)
     const [screenshot, setScreenshot] =
         useState<ScreenshotData>(screenshotProps.exampleScreenshot)
 
-    const onSubmit = async (data: GenerateScreenshotsRequest) => {
+    const onSubmit = async (data: GenerateFullPageScreenshotRequest) => {
         setGenerating(true)
 
         try {
@@ -125,13 +151,12 @@ export function Screenshots(screenshotProps: ExampleScreenshotProps) {
                 const result = (await response.json()) as {
                     screenshot: ScreenshotData
                 }
-
                 if (result.screenshot) {
                     return setScreenshot(result.screenshot)
                 }
             }
 
-            throw new Error("Failed to generate screenshots")
+            throw new Error("Failed to generate screenshot")
         } catch (error) {
             toast({
                 variant: "destructive",
@@ -144,6 +169,7 @@ export function Screenshots(screenshotProps: ExampleScreenshotProps) {
     }
 
     return (
+        // <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
         <div>
             <form
                 onSubmit={handleSubmit(onSubmit)}
@@ -157,15 +183,31 @@ export function Screenshots(screenshotProps: ExampleScreenshotProps) {
                         placeholder={screenshotProps.exampleScreenshotUrl}
                         {...register("website")}
                     />
-                    {/* <Label htmlFor="scale-factor">Choose the scale factor:</Label>
-                    <select id="scale-factor">
-                        <option value="1" defaultChecked>1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                    </select> */}
+                    
                     {errors.website && errors.website?.message && (
                         <p className="text-sm text-destructive">
                             {errors.website?.message}
+                        </p>
+                    )}
+                </div>
+                <div className="grid w-full items-center gap-1.5">
+                    <Label htmlFor="deviceName">Choose device:</Label>
+                    <Controller
+                        name="deviceName"
+                        control={control}
+                        render={({
+                            field: { onChange, value, ref, ...props },
+                        }) => (
+                            <DeviceSelect
+                                onValueChange={onChange}
+                                value={value}
+                                forwardedRef={ref}
+                            />
+                        )}
+                    />
+                    {errors.deviceName && errors.deviceName?.message && (
+                        <p className="text-sm text-destructive">
+                            {errors.deviceName?.message}
                         </p>
                     )}
                 </div>
@@ -180,11 +222,14 @@ export function Screenshots(screenshotProps: ExampleScreenshotProps) {
                     )}
                 </Button>
             </form>
-            <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
+            {/* <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10"> */}
+            <div>
                 <Screenshot
                     key={screenshot.url}
                     url={screenshot.url}
                     fullPage={screenshot.fullPage}
+                    viewportWidth={screenshot.viewportWidth}
+                    viewportHeight={screenshot.viewportHeight}
                     device={screenshot.device}
                 />
             </div>

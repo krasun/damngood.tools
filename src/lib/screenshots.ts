@@ -1,6 +1,6 @@
 import * as screenshotone from "screenshotone-api-sdk"
 
-import { PathVariables, Screenshot, ScreenshotDevice, screenshotDevices, screenshotExampleUrl, screenshotFullPage } from "./shared"
+import { ScreenshotOptions, Screenshot, ScreenshotDevice, screenshotDevices, screenshotExampleUrl, screenshotFullPage } from "./shared"
 
 const globalForScreenshotOne = global as unknown as {
     screenshotoneClient: screenshotone.Client
@@ -25,7 +25,7 @@ const screenshotoneClient =
 if (process.env.NODE_ENV !== "production")
     globalForScreenshotOne.screenshotoneClient = screenshotoneClient
 
-export function screenshotUrl(url: string, pathVariables: PathVariables): string {
+export function screenshotUrl(url: string, screenshotOptions: ScreenshotOptions): string {
     const cacheKey =
         url == screenshotExampleUrl
             ? "example"
@@ -41,13 +41,10 @@ export function screenshotUrl(url: string, pathVariables: PathVariables): string
         .cacheKey(cacheKey)
         .cacheTtl(cacheTtl)
         .reducedMotion(true)
-        .deviceScaleFactor(pathVariables.deviceScaleFactor ?? 1)
-    if (pathVariables.fullPage) {
-        options.fullPage(pathVariables.fullPage)
-    } else {
-        options.viewportWidth(pathVariables.viewportWidth ?? 0)
-        options.viewportHeight(pathVariables.viewportHeight ?? 0)
-    }
+        .deviceScaleFactor(screenshotOptions.deviceScaleFactor ?? 1)
+        .fullPage(screenshotOptions.fullPage ?? false)
+        .viewportWidth(screenshotOptions.viewportWidth ?? 0)
+        .viewportHeight(screenshotOptions.viewportHeight ?? 0)
 
     return screenshotoneClient.generateSignedTakeURL(options)
 }
@@ -61,15 +58,14 @@ export async function generateScreenshots(url: string): Promise<Screenshot[]> {
 }
 
 export async function generateExampleScreenshot(): Promise<Screenshot> {
-    return await generateScreenshot(screenshotExampleUrl);
+    return await generateScreenshot(screenshotExampleUrl, screenshotFullPage);
 }
 
-export async function generateScreenshot(url: string): Promise<Screenshot> {
-    return mapScreenshot(url, screenshotFullPage); 
+export async function generateScreenshot(url: string, device: ScreenshotDevice): Promise<Screenshot> {
+    return mapScreenshot(url, device); 
 }
 
 function mapScreenshot(url: string, screenshotDevice: ScreenshotDevice): Screenshot { 
-    console.log(screenshotUrl(url, screenshotDevice))
     return {
         url: screenshotUrl(url, screenshotDevice),
         viewportWidth: screenshotDevice.viewportWidth,

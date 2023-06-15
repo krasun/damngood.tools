@@ -1,5 +1,5 @@
 import { PageHeader } from "@/components/page-header"
-import { Screenshots } from "./FullPageScreenshot"
+import { FullPageScreenshot } from "./FullPageScreenshot"
 import { generateExampleScreenshot} from "@/lib/screenshots"
 import { screenshotExampleUrl } from "@/lib/shared";
 
@@ -12,7 +12,7 @@ export default async function ScreenshotsForDimensions() {
                 heading="Full Page Screenshot"
                 subheading="Get full page screenshot now!"
             />                        
-            <Screenshots exampleScreenshot={exampleScreenshot} exampleScreenshotUrl={screenshotExampleUrl} />            
+            <FullPageScreenshot exampleScreenshot={exampleScreenshot} exampleScreenshotUrl={screenshotExampleUrl} />            
         </>
     )
 }
